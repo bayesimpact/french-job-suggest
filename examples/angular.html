@@ -1,0 +1,65 @@
+<!doctype html>
+<html ng-app="myApp">
+  <head>
+    <script src="https://cdn.jsdelivr.net/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.angular.min.js"></script>
+    <script>
+      angular.module('myApp', ['algoliasearch', 'algolia.autocomplete']).
+        controller('myController', function($scope, algolia) {
+          var client = algolia.Client('K6ACI9BKKT', 'da4db0bf437e37d6d49cefcb8768c67a');
+          var index = client.initIndex('jobs');
+          $scope.getDatasets = function() {
+            return {
+              source: algolia.sources.hits(index, { hitsPerPage: 5 }),
+              displayKey: 'libelle_appellation_court',
+              templates: {
+                suggestion: function(suggestion) {
+                  return suggestion._highlightResult.libelle_appellation_long.value;
+                }
+              }
+            };
+          };
+
+          $scope.$on('autocomplete:selected', function(event, suggestion, dataset) {
+            $scope.suggestion = JSON.stringify(suggestion, null, 2);
+            console.log(suggestion, dataset);
+          });
+        });
+    </script>
+    <style>
+      .algolia-autocomplete {
+        width: 100%;
+      }
+      .algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
+        width: 100%;
+      }
+      .algolia-autocomplete .aa-hint {
+        color: #999;
+      }
+      .algolia-autocomplete .aa-dropdown-menu {
+        width: 100%;
+        background-color: #fff;
+        border: 1px solid #999;
+        border-top: none;
+      }
+      .algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
+        cursor: pointer;
+        padding: 5px 4px;
+      }
+      .algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
+        background-color: #B2D7FF;
+      }
+      .algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
+        font-weight: bold;
+        font-style: normal;
+      }
+    </style>
+  </head>
+  <div ng-controller="myController">
+    <input type="text" id="search-input" autocomplete aa-datasets="getDatasets()"
+           placeholder="Enter a job title..."/>
+    <pre ng-show="suggestion" ng-bind="suggestion"></pre>
+  </div>
+</html>

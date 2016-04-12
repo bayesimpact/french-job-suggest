@@ -8,6 +8,6 @@ ENV ALGOLIA_APP_ID K6ACI9BKKT
 
 WORKDIR /root
 
-COPY generate.sh upload.py bin/
+COPY generate.sh upload.py Makefile bin/
 
 CMD ["bin/generate.sh"]

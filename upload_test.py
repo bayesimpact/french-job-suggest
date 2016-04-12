@@ -18,25 +18,24 @@ class DataPrepareTestCase(unittest.TestCase):
 
         self.assertEqual(9, len(dicts))
         for job in dicts:
-            # TODO: Use camelCase instead of snake_names.
             self.assertEqual([
-                'code_ogr',
-                'code_rome',
-                'code_type_section_appellation',
-                'libelle_appellation_court',
-                'libelle_appellation_long',
-                'libelle_rome',
-                'libelle_type_section_appellation',
+                'codeOgr',
+                'codeRome',
+                'codeTypeSectionAppellation',
+                'libelleAppellationCourt',
+                'libelleAppellationLong',
+                'libelleRome',
+                'libelleTypeSectionAppellation',
                 'statut',
             ], sorted(job.keys()))
 
         first_job = dicts[0]
         self.assertEqual(
             u'Abatteur / Abatteuse de carrière',
-            first_job['libelle_appellation_court'])
-        self.assertEqual('10200', first_job['code_ogr'])
-        self.assertEqual('F1402', first_job['code_rome'])
-        self.assertEqual('Extraction solide', first_job['libelle_rome'])
+            first_job['libelleAppellationCourt'])
+        self.assertEqual('10200', first_job['codeOgr'])
+        self.assertEqual('F1402', first_job['codeRome'])
+        self.assertEqual('Extraction solide', first_job['libelleRome'])
 
 
 if __name__ == '__main__':

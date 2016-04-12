@@ -30,6 +30,12 @@ def csv_to_dicts(csv_appellation, csv_code_rome):
     suggestions = pandas.merge(
         appellations, code_rome,
         left_on='code_rome', right_on='code_rome', how='left')
+
+    mapping = {
+        name:_snake_to_came_case(name)
+        for name in suggestions.columns.tolist()}
+    suggestions.rename(columns=mapping, inplace=True)
+
     return suggestions.to_dict(orient='records')
 
 
@@ -42,6 +48,11 @@ def upload(csv_appellation, csv_code_rome):
     except helpers.AlgoliaException:
         print(json.dumps(suggestions[:10], indent=2))
         raise
+
+
+def _snake_to_came_case(snake_name):
+    components = snake_name.split('_')
+    return components[0] + "".join(x.title() for x in components[1:])
 
 
 if __name__ == '__main__':

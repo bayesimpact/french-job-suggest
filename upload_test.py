@@ -34,8 +34,7 @@ class DataPrepareTestCase(unittest.TestCase):
         self.assertEqual(
             u'Abatteur / Abatteuse de carrière',
             first_job['libelle_appellation_court'])
-        # TODO: Make it a string and not an int.
-        self.assertEqual(10200, first_job['code_ogr'])
+        self.assertEqual('10200', first_job['code_ogr'])
         self.assertEqual('F1402', first_job['code_rome'])
         self.assertEqual('Extraction solide', first_job['libelle_rome'])
 

@@ -24,6 +24,7 @@ _JOB_INDEX = _CLIENT.init_index(os.getenv('ALGOLIA_JOB_INDEX', 'jobs'))
 
 def csv_to_dicts(csv_appellation, csv_code_rome):
     appellations = pandas.read_csv(csv_appellation)
+    appellations['code_ogr'] = appellations['code_ogr'].astype(str)
     code_rome = pandas.DataFrame(
         pandas.read_csv(csv_code_rome),
         columns=['code_rome', 'libelle_rome'])

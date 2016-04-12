@@ -17,10 +17,6 @@ from algoliasearch import algoliasearch
 from algoliasearch import helpers
 import pandas
 
-_CLIENT = algoliasearch.Client(
-    os.getenv('ALGOLIA_APP_ID'), os.getenv('ALGOLIA_API_KEY'))
-_JOB_INDEX = _CLIENT.init_index(os.getenv('ALGOLIA_JOB_INDEX', 'jobs'))
-
 
 def csv_to_dicts(csv_appellation, csv_code_rome):
     appellations = pandas.read_csv(csv_appellation)
@@ -43,9 +39,12 @@ def csv_to_dicts(csv_appellation, csv_code_rome):
 def upload(csv_appellation, csv_code_rome):
     """Upload jobs suggestions to Algolia."""
     suggestions = csv_to_dicts(csv_appellation, csv_code_rome)
+    client = algoliasearch.Client(
+        os.getenv('ALGOLIA_APP_ID'), os.getenv('ALGOLIA_API_KEY'))
+    job_index = client.init_index(os.getenv('ALGOLIA_JOB_INDEX', 'jobs'))
     try:
-        _JOB_INDEX.clear_index()
-        _JOB_INDEX.add_objects(suggestions)
+        job_index.clear_index()
+        job_index.add_objects(suggestions)
     except helpers.AlgoliaException:
         print(json.dumps(suggestions[:10], indent=2))
         raise

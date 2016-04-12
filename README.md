@@ -8,6 +8,11 @@ The data is hosted by [Algolia](https://www.algolia.com), so you can use any of
 their client integration, especially the ones for
 [Autocomplete](https://www.algolia.com/doc/search/auto-complete).
 
+# Usage
+
+Check out the code for our examples in the `examples` folder, or try it our
+[live demo](https://cdn.rawgit.com/bayesimpact/french-job-suggest/master/examples/angular.html).
+
 # Importing Data
 
 This repository contains all the code that we use to generate the data. You can

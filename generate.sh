@@ -19,4 +19,6 @@ sed -i -e "s/''/'/g" data/rome/*.csv
 
 # Upload the names to Algolia.
 DIR="$(dirname "${BASH_SOURCE[0]}")"
-python "$DIR/upload.py" data/rome/unix_referentiel_appellation_v*_utf8.csv
+python "$DIR/upload.py" \
+  data/rome/unix_referentiel_appellation_v*_utf8.csv \
+  data/rome/unix_referentiel_code_rome_v*_utf8.csv

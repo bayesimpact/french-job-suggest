@@ -17,8 +17,14 @@ fi
 # Clean up the double single quotes.
 sed -i -e "s/''/'/g" data/rome/*.csv
 
+# Download the mapping from Rome to FAP.
+if [ ! -e data/passage_fap2009_romev3.txt ]; then
+  wget -P data http://dares.travail-emploi.gouv.fr/IMG/txt/passage_fap2009_romev3.txt
+fi
+
 # Upload the names to Algolia.
 DIR="$(dirname "${BASH_SOURCE[0]}")"
 python "$DIR/upload.py" \
   data/rome/unix_referentiel_appellation_v*_utf8.csv \
-  data/rome/unix_referentiel_code_rome_v*_utf8.csv
+  data/rome/unix_referentiel_code_rome_v*_utf8.csv \
+  data/passage_fap2009_romev3.txt

@@ -30,7 +30,21 @@
     </script>
     <style>
       .algolia-autocomplete {
-        width: 100%;
+        display: block !important;
+        padding-right: 95px;
+        position: relative;
+      }
+      .algolia-autocomplete:after {
+        content: "by";
+        background-image: url('Algolia_logo_bg-white.svg');
+        background-size: 67px 21px;
+        background-repeat: no-repeat;
+        background-position-x: 20px;
+        height: 21px;
+        width: 87px;
+        position: absolute;
+        right: 0;
+        top: 0;
       }
       .algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
         width: 100%;

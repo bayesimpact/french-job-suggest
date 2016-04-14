@@ -13,10 +13,10 @@
           $scope.getDatasets = function() {
             return {
               source: algolia.sources.hits(index, { hitsPerPage: 5 }),
-              displayKey: 'libelle_appellation_court',
+              displayKey: 'libelleAppellationCourt',
               templates: {
                 suggestion: function(suggestion) {
-                  return suggestion._highlightResult.libelle_appellation_long.value;
+                  return suggestion._highlightResult.libelleAppellationLong.value;
                 }
               }
             };

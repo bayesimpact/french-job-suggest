@@ -42,3 +42,11 @@ During development iterations, we recommend to mount the live files into the con
 ```
 docker run -e "ALGOLIA_API_KEY=<the secret API>" -v "$(pwd)/":/root/bin bayesimpact/french-job-suggest
 ```
+
+## Test
+
+To run tests, mount live files into the container so that you don't need to re-build the image each time:
+
+```
+docker run -v "$(pwd)/":/root/bin bayesimpact/french-job-suggest python bin/upload_test.py
+```

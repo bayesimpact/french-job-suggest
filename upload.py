@@ -7,7 +7,9 @@ It relies on environment variables to be set correctly:
 
 The script takes two arguments:
  - a path to the csv file containing the definition of jobs in the ROME,
- - a path to the csv file containing the definition of job groups in the ROME.
+ - a path to the csv file containing the definition of job groups in the ROME,
+ - a path to the file with correspondance from ROME job group to FAP codes,
+ - a path to the JSON file with job frequencies.
 """
 import codecs
 import json
@@ -25,7 +27,8 @@ _ROME_FAP_MAPPING_REGEXP = re.compile(
     r'^(?P<rome_ids>(?:"[A-Z]\d{4}",?)+)\s*=\s*"(?P<fap>[A-Z]\d[A-Z]\d\d)"$')
 
 
-def csv_to_dicts(csv_appellation, csv_code_rome, txt_fap_rome):
+def csv_to_dicts(
+        csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
     # Read appellations from CSV.
     appellations = pandas.read_csv(csv_appellation)
     appellations['code_ogr'] = appellations['code_ogr'].astype(str)
@@ -42,6 +45,12 @@ def csv_to_dicts(csv_appellation, csv_code_rome, txt_fap_rome):
     suggestions = pandas.merge(
         suggestions, rome_to_fap, on='code_rome', how='left')
 
+    # Join with jobs frequency from exernal file.
+    with open(json_jobs_frequency) as jobs_frequency_file:
+        jobs_frequency = json.load(jobs_frequency_file)
+    suggestions['frequency'] = (
+        suggestions['code_ogr'].map(jobs_frequency).fillna(0))
+
     # Swith properties to camelCase.
     mapping = {
         name: _snake_to_camel_case(name)
@@ -54,9 +63,10 @@ def csv_to_dicts(csv_appellation, csv_code_rome, txt_fap_rome):
             for record in records]
 
 
-def upload(csv_appellation, csv_code_rome, txt_fap_rome):
+def upload(csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
     """Upload jobs suggestions to Algolia."""
-    suggestions = csv_to_dicts(csv_appellation, csv_code_rome, txt_fap_rome)
+    suggestions = csv_to_dicts(
+        csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency)
     client = algoliasearch.Client(
         os.getenv('ALGOLIA_APP_ID'), os.getenv('ALGOLIA_API_KEY'))
     job_index = client.init_index(os.getenv('ALGOLIA_JOB_INDEX', 'jobs'))

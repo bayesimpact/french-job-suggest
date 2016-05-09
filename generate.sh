@@ -7,4 +7,5 @@ make -f "$DIR/Makefile"
 python "$DIR/upload.py" \
   data/rome/unix_referentiel_appellation_v*_utf8.csv \
   data/rome/unix_referentiel_code_rome_v*_utf8.csv \
-  data/passage_fap2009_romev3.txt
+  data/passage_fap2009_romev3.txt \
+  jobs_frequency.json

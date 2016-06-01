@@ -1,0 +1,53 @@
+<!doctype html>
+<html ng-app="jobImagesApp">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Job Images</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script>
+      angular.module('jobImagesApp', []).
+      controller('ImagesList', function ($scope, $http) {
+        $http.get('job-images.json').then(function(response) {
+          $scope.images = response.data
+        })
+        $scope.display = 'patchwork'
+      })
+    </script>
+    <style>
+      ul { padding: 0 }
+      li {
+        border: solid 1px;
+        margin: 10px 0;
+        list-style: none;
+      }
+      li span {
+        line-height: 170px;
+        vertical-align: top;
+      }
+      li img {
+        margin-right: 20px;
+      }
+    </style>
+  </head>
+  <body ng-controller="ImagesList">
+    <h1>Job Images</h1>
+    <div>
+      <label>
+        <input type="radio" ng-model="display" value="list" />
+        as a list
+      </label>
+      <label>
+        <input type="radio" ng-model="display" value="patchwork" />
+        as a patchwork
+      </label>
+    </div>
+    <ul ng-show="display == 'list'">
+      <li ng-repeat="(job, link) in images">
+        <img ng-src="{{link}}" alt="{{job}}" title="{{job}}" />
+        <span ng-bind="job" />
+      </li>
+    </ul>
+    <img ng-hide="display == 'list'" ng-repeat="(job, link) in images"
+         ng-src="{{link}}" alt="{{job}}" title="{{job}}" />
+  </body>
+</html>

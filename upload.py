@@ -21,6 +21,8 @@ from algoliasearch import algoliasearch
 from algoliasearch import helpers
 import pandas
 
+import rome_genderization
+
 # Regular expression to match mapping of ROME to FAP codes.
 # Matches strings like '"A1201","A1205"   =   "A0Z42"'
 _ROME_FAP_MAPPING_REGEXP = re.compile(
@@ -32,6 +34,10 @@ def csv_to_dicts(
     # Read appellations from CSV.
     appellations = pandas.read_csv(csv_appellation)
     appellations['code_ogr'] = appellations['code_ogr'].astype(str)
+
+    # Genderize names.
+    _genderize(appellations, 'libelle_appellation_court')
+    _genderize(appellations, 'libelle_appellation_long')
 
     # Join with ROME names.
     code_rome = pandas.DataFrame(
@@ -81,6 +87,19 @@ def upload(csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
 def _snake_to_camel_case(snake_name):
     components = snake_name.split('_')
     return components[0] + "".join(x.title() for x in components[1:])
+
+
+def _genderize(data_frame, field, suffixes=('_masculin', '_feminin')):
+    """Update a pandas DataFrame by genderizing one if its column.
+
+    Args:
+        data_frame: the DataFrame to update.
+        field: the name of the column to genderize.
+        suffixes: the suffixes of the new column to create.
+    """
+    masculine, feminine = rome_genderization.genderize(data_frame[field])
+    data_frame[field + suffixes[0]] = masculine
+    data_frame[field + suffixes[1]] = feminine
 
 
 def _fap_rome_simple_mapping(txt_fap_rome):

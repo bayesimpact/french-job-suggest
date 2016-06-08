@@ -49,4 +49,5 @@ To run tests, mount live files into the container so that you don't need to re-b
 
 ```
 docker run -v "$(pwd)/":/root/bin bayesimpact/french-job-suggest python bin/upload_test.py
+docker run -v "$(pwd)/":/root/bin bayesimpact/french-job-suggest python bin/rome_genderization_test.py
 ```

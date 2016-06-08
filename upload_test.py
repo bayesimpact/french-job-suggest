@@ -27,7 +27,11 @@ class DataPrepareTestCase(unittest.TestCase):
                 'codeTypeSectionAppellation',
                 'frequency',
                 'libelleAppellationCourt',
+                'libelleAppellationCourtFeminin',
+                'libelleAppellationCourtMasculin',
                 'libelleAppellationLong',
+                'libelleAppellationLongFeminin',
+                'libelleAppellationLongMasculin',
                 'libelleRome',
                 'libelleTypeSectionAppellation',
                 'statut',
@@ -37,6 +41,12 @@ class DataPrepareTestCase(unittest.TestCase):
         self.assertEqual(
             u'Abatteur / Abatteuse de carrière',
             first_job['libelleAppellationCourt'])
+        self.assertEqual(
+            u'Abatteuse de carrière',
+            first_job['libelleAppellationCourtFeminin'])
+        self.assertEqual(
+            u'Abatteur de carrière',
+            first_job['libelleAppellationCourtMasculin'])
         self.assertEqual('10200', first_job['codeOgr'])
         self.assertEqual('F1402', first_job['codeRome'])
         self.assertNotIn('codeFap', first_job)

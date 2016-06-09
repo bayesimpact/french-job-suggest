@@ -8,6 +8,7 @@ ENV ALGOLIA_APP_ID K6ACI9BKKT
 
 WORKDIR /root
 
-COPY generate.sh upload.py Makefile jobs_frequency.json bin/
+COPY generate.sh rome_genderization.py upload.py Makefile bin/
+COPY jobs_frequency.json data/
 
 CMD ["bin/generate.sh"]

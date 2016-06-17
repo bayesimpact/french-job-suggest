@@ -4,33 +4,151 @@
     <meta charset="utf-8"/>
     <title>Job Images</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
     <script>
-      angular.module('jobImagesApp', []).
+      angular.module('jobImagesApp', ['ngAnimate']).
       controller('ImagesList', function ($scope, $http) {
         $http.get('job-images.json').then(function(response) {
-          $scope.images = response.data
+          $scope.jobs = []
+          for (job in response.data) {
+            $scope.jobs.push({name: job, link: response.data[job]})
+          }
         })
         $scope.display = 'patchwork'
+        $scope.boolEqual = function(actual, expected) {
+          return !!expected === !!actual
+        }
+        $scope.jobNeedFix = function(job) {
+          if (job.needFix) {
+            return
+          }
+          $scope.$apply(function() {
+            job.needFix = true
+          })
+        }
+        $scope.jobIsGood = function(job) {
+          if (job.isGood) {
+            return
+          }
+          $scope.$apply(function() {
+            job.isGood = true
+          })
+        }
+      }).
+      directive('jobImg', function() {
+        return {
+          template: '<div class="job-image-overlay">' +
+            '  <div ng-bind="job.name"></div>' +
+            '  <div class="buttons"><button /><button /></div>' +
+            '</div>' +
+            '<img alt="{{job.name}}" ng-src="{{job.link}}" />',
+          link: function(scope, element, attrs) {
+            const job = scope.$eval('job')
+              element.attr('title', job.name)
+              const children = element.children().children()
+              const buttons = children.children()
+              angular.element(buttons[0]).text('Need fix').on('click', function() {
+                scope.jobNeedFix(job)
+              })
+            angular.element(buttons[1]).text('Good').on('click', function() {
+              scope.jobIsGood(job)
+            })
+          }
+        }
+      }).
+      filter('empty', function() {
+        return function(a) { return !a || !a.length }
       })
     </script>
     <style>
-      ul { padding: 0 }
-      li {
+      ul.jobs { padding: 0 }
+      ul.jobs li {
         border: solid 1px;
         margin: 10px 0;
         list-style: none;
       }
-      li span {
+      ul.jobs li span {
         line-height: 170px;
         vertical-align: top;
       }
-      li img {
+      ul.jobs li job-img {
         margin-right: 20px;
+      }
+      job-img {
+        display: inline-block;
+        height: 170px;
+        position: relative;
+      }
+      .job-image-overlay {
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        display: none;
+        flex-direction: column;
+        font-weight: 700;
+        height: 100%;
+        justify-content: space-around;
+        left: 0;
+        line-height: initial;
+        position: absolute;
+        text-align: center;
+        top: 0;
+        width: 100%;
+        z-index: 1;
+      }
+      job-img:hover .job-image-overlay {
+        display: flex;
+      }
+      job-img.ng-leave:hover .job-image-overlay, .ng-leave job-img:hover .job-image-overlay {
+        display: none;
+      }
+      .ng-leave {
+        opacity: 1;
+        transition: all linear 0.5s;
+      }
+      .ng-leave.ng-leave-active {
+        opacity: 0;
+      }
+      .patchwork.ng-leave {
+        max-width: 230px;
+      }
+      .patchwork.ng-leave.ng-leave-active {
+        max-width: 0;
+      }
+      li.ng-leave {
+        max-height: 170px;
+      }
+      li.ng-leave.ng-leave-active {
+        max-height: 0;
+        overflow: hidden;
+      }
+      li.ng-enter {
+        max-height: 0;
+        opacity: 0;
+        transition: all linear 0.5s;
+      }
+      li.ng-enter-active {
+        max-height: 18px;
+        opacity: 1;
+      }
+      .buttons {
+        display: flex;
+        justify-content: space-around;
+      }
+      .buttons button {
+        cursor: pointer;
       }
     </style>
   </head>
   <body ng-controller="ImagesList">
     <h1>Job Images</h1>
+    <fieldset ng-hide="jobs | filter: {needFix: true}: true | empty">
+      <legend>
+        Images need fixing
+      </legend>
+      <ul>
+        <li ng-repeat="job in jobs | filter: {needFix: true}: true | orderBy:'name'" ng-bind="job.name"></li>
+      </ul>
+    </fieldset>
     <div>
       <label>
         <input type="radio" ng-model="display" value="list" />
@@ -41,13 +159,13 @@
         as a patchwork
       </label>
     </div>
-    <ul ng-show="display == 'list'">
-      <li ng-repeat="(job, link) in images">
-        <img ng-src="{{link}}" alt="{{job}}" title="{{job}}" />
-        <span ng-bind="job" />
+    <ul ng-show="display == 'list'" class="jobs">
+      <li ng-repeat="job in jobs | filter : {needFix: false, isGood: false} : boolEqual">
+        <job-img></job-img>
+        <span ng-bind="job.name" />
       </li>
     </ul>
-    <img ng-hide="display == 'list'" ng-repeat="(job, link) in images"
-         ng-src="{{link}}" alt="{{job}}" title="{{job}}" />
+    <job-img class="patchwork" ng-hide="display == 'list'"
+             ng-repeat="job in jobs | filter : {needFix: false, isGood: false} : boolEqual"></job-img>
   </body>
 </html>

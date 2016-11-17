@@ -18,7 +18,7 @@ Check out the code for our examples in the `examples` folder, or try it our
 This repository contains all the code that we use to generate the data. You can
 use it to create your own Algolia base if you wish.
 
-We download the ROME data from Pôle Emploi, then clean it up and transform the
+We download the ROME data from [Pôle Emploi](http://www.pole-emploi.org/informations/open-data-pole-emploi-@/view-category-25799.html) (click [here](https://api.emploi-store.fr/api/docs/romeopen/REF_ROME_CSV/1/RefRomeCsv.zip) to download the data), then clean it up and transform the
 CSV to JSON before uploading it to Algolia.
 
 To run it you will need the API key that has the following rights `addObject,

@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+import time
 
 from algoliasearch import algoliasearch
 from algoliasearch import helpers
@@ -75,11 +76,20 @@ def upload(csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
         csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency)
     client = algoliasearch.Client(
         os.getenv('ALGOLIA_APP_ID'), os.getenv('ALGOLIA_API_KEY'))
-    job_index = client.init_index(os.getenv('ALGOLIA_JOB_INDEX', 'jobs'))
+    index_name = os.getenv('ALGOLIA_JOB_INDEX', 'jobs')
+    job_index = client.init_index(index_name)
+    tmp_index_name = '%s_%x' % (index_name, round(time.time()))
+    tmp_job_index = client.init_index(tmp_index_name)
+
     try:
-        job_index.clear_index()
-        job_index.add_objects(suggestions)
+        tmp_job_index.set_settings(job_index.get_settings())
+        tmp_job_index.add_objects(suggestions)
+
+        # OK we're ready finally replace the index.
+        if not os.getenv('DRY_RUN'):
+            client.move_index(tmp_index_name, index_name)
     except helpers.AlgoliaException:
+        tmp_job_index.clear_index()
         print(json.dumps(suggestions[:10], indent=2))
         raise
 

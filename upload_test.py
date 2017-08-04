@@ -18,7 +18,7 @@ class DataPrepareTestCase(unittest.TestCase):
             path.join(_TESTDATA_DIR, 'passage_fap2009_romev3.txt'),
             path.join(_TESTDATA_DIR, 'jobs_frequency.json'))
 
-        self.assertEqual(9, len(dicts))
+        self.assertEqual(11, len(dicts))
         for job in dicts:
             keys = set(job.keys()) - set(['codeFap'])
             self.assertEqual([
@@ -57,6 +57,10 @@ class DataPrepareTestCase(unittest.TestCase):
         self.assertEqual('U1Z80', dicts[3]['codeFap'])
         self.assertEqual('L1503', dicts[3]['codeRome'])
         self.assertEqual(0, dicts[3]['frequency'])
+
+        self.assertEqual(u'Égoutier / Égoutière', dicts[10]['libelleAppellationCourt'])
+        self.assertEqual(u'Égoutier / Égoutière', dicts[10]['libelleAppellationLong'])
+        self.assertEqual(u'Égoutier', dicts[10]['libelleAppellationCourtMasculin'])
 
 
 if __name__ == '__main__':

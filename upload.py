@@ -1,3 +1,4 @@
+# encoding: utf-8
 """Script to upload job suggestions to Algolia.
 
 It relies on environment variables to be set correctly:
@@ -29,12 +30,22 @@ import rome_genderization
 _ROME_FAP_MAPPING_REGEXP = re.compile(
     r'^(?P<rome_ids>(?:"[A-Z]\d{4}",?)+)\s*=\s*"(?P<fap>[A-Z]\d[A-Z]\d\d)"$')
 
+# Regular expression to match unaccented capital E in French text that should
+# be capitalized. It has been computed empirically by testing on the full ROME.
+# It matches the E in "Etat", "Ecrivain", "Evolution", but not in "Entreprise",
+# "Ethnologue" nor "Euro".
+_UNACCENTED_E_REGEXP = r'E(?=([bcdfghjklpqrstvz]|[cpt][hlr])[aeiouyéèêë])'
+
 
 def csv_to_dicts(
         csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
     # Read appellations from CSV.
     appellations = pandas.read_csv(csv_appellation)
     appellations['code_ogr'] = appellations['code_ogr'].astype(str)
+
+    # Add missing accents.
+    _add_accents(
+        appellations, ('libelle_appellation_court', 'libelle_appellation_long'))
 
     # Genderize names.
     _genderize(appellations, 'libelle_appellation_court')
@@ -44,6 +55,7 @@ def csv_to_dicts(
     code_rome = pandas.DataFrame(
         pandas.read_csv(csv_code_rome),
         columns=['code_rome', 'libelle_rome'])
+    _add_accents(code_rome, ('libelle_rome',))
     suggestions = pandas.merge(
         appellations, code_rome, on='code_rome', how='left')
 
@@ -110,6 +122,17 @@ def _genderize(data_frame, field, suffixes=('_masculin', '_feminin')):
     masculine, feminine = rome_genderization.genderize(data_frame[field])
     data_frame[field + suffixes[0]] = masculine
     data_frame[field + suffixes[1]] = feminine
+
+
+def _add_accents(data_frame, fields):
+    """Add an accent on capitalized letters if needed.
+
+    Most of the capitalized letters have no accent even if the French word
+    would require one. This function fixes this by using heuristics.
+    """
+    for field in fields:
+        data_frame[field] = data_frame[field].str.replace(
+            _UNACCENTED_E_REGEXP, 'É')
 
 
 def _fap_rome_simple_mapping(txt_fap_rome):

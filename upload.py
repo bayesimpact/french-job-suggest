@@ -32,9 +32,13 @@ _ROME_FAP_MAPPING_REGEXP = re.compile(
 
 # Regular expression to match unaccented capital E in French text that should
 # be capitalized. It has been computed empirically by testing on the full ROME.
-# It matches the E in "Etat", "Ecrivain", "Evolution", but not in "Entreprise",
-# "Ethnologue" nor "Euro".
-_UNACCENTED_E_REGEXP = r'E(?=([bcdfghjklpqrstvz]|[cpt][hlr])[aeiouyéèêë])'
+# It matches the E in "Etat", "Ecrivain", "Evolution", "Energie", "Enigme" but
+# not in "Entreprise", "Ethnologue", "Emoji", "Enivrer" nor "Euro".
+_UNACCENTED_E_REGEXP = (
+    r'E(?=('
+    '([bcdfghjklpqrstvz]|[cpt][hlr])[aeiouyéèêë]|'
+    'n([eouyéèêë]|i[^v]|a[^m])|'
+    'm([aeiuyéèêë]|o[^j])))')
 
 
 def csv_to_dicts(

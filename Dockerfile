@@ -1,6 +1,6 @@
 FROM tailordev/pandas:0.17.1
 
-RUN apt-get update -qqy && apt-get install -qqy unzip && \
+RUN apt-get update -qqy && apt-get install -qqy unzip ca-certificates && \
   pip install algoliasearch
 
 ENV ALGOLIA_APP_ID K6ACI9BKKT

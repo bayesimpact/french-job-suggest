@@ -13,6 +13,7 @@ The script takes two arguments:
  - a path to the JSON file with job frequencies.
 """
 import codecs
+import collections
 import json
 import os
 import re
@@ -39,6 +40,12 @@ _UNACCENTED_E_REGEXP = (
     '([bcdfghjklpqrstvz]|[cpt][hlr])[aeiouyéèêë]|'
     'n([eouyéèêë]|i[^v]|a[^m])|'
     'm([aeiuyéèêë]|o[^j])))')
+
+_ExtraJob = collections.namedtuple('ExtraJob', ['code_ogr', 'code_ogr_origin', 'name'])
+
+_EXTRA_JOBS = [
+    _ExtraJob('126549a', '126549', 'Product designer'),
+]
 
 
 def csv_to_dicts(
@@ -74,6 +81,20 @@ def csv_to_dicts(
     suggestions['frequency'] = (
         suggestions['code_ogr'].map(jobs_frequency).fillna(0))
 
+    # Add extra jobs.
+    extra_jobs = []
+    for extra_job in _EXTRA_JOBS:
+        origin = suggestions[suggestions.code_ogr == extra_job.code_ogr_origin]
+        if len(origin) != 1:
+            raise ValueError('Error while locating the origin for {}'.format(extra_job))
+        new_job = origin.iloc[0, :].copy(deep=True)
+        new_job.code_ogr = extra_job.code_ogr
+        for size in ('court', 'long'):
+            for gender in ('', '_masculin', '_feminin'):
+                new_job['libelle_appellation_{}{}'.format(size, gender)] = extra_job.name
+        extra_jobs.append(new_job)
+    suggestions = suggestions.append(extra_jobs, ignore_index=True)
+
     # Swith properties to camelCase.
     mapping = {
         name: _snake_to_camel_case(name)
@@ -82,8 +103,10 @@ def csv_to_dicts(
 
     # Convert from pandas.DataFrame to Python list of dicts.
     records = suggestions.to_dict(orient='records')
-    return [{k: v for k, v in record.items() if not pandas.isnull(v)}
-            for record in records]
+    return [
+        {k: v for k, v in record.items() if not pandas.isnull(v)}
+        for record in records
+    ]
 
 
 def upload(csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):

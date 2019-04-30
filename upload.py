@@ -20,8 +20,8 @@ import re
 import sys
 import time
 
-from algoliasearch import algoliasearch
-from algoliasearch import helpers
+from algoliasearch import exceptions
+from algoliasearch import search_client
 import pandas
 
 import rome_genderization
@@ -113,7 +113,7 @@ def upload(csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
     """Upload jobs suggestions to Algolia."""
     suggestions = csv_to_dicts(
         csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency)
-    client = algoliasearch.Client(
+    client = search_client.SearchClient.create(
         os.getenv('ALGOLIA_APP_ID'), os.getenv('ALGOLIA_API_KEY'))
     index_name = os.getenv('ALGOLIA_JOB_INDEX', 'jobs')
     job_index = client.init_index(index_name)
@@ -127,7 +127,7 @@ def upload(csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
         # OK we're ready finally replace the index.
         if not os.getenv('DRY_RUN'):
             client.move_index(tmp_index_name, index_name)
-    except helpers.AlgoliaException:
+    except exceptions.AlgoliaException:
         tmp_job_index.clear_index()
         print(json.dumps(suggestions[:10], indent=2))
         raise

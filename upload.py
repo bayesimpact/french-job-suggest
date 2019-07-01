@@ -122,13 +122,15 @@ def upload(csv_appellation, csv_code_rome, txt_fap_rome, json_jobs_frequency):
 
     try:
         tmp_job_index.set_settings(job_index.get_settings())
-        tmp_job_index.add_objects(suggestions)
+        tmp_job_index.save_objects(suggestions, {
+            'autoGenerateObjectIDIfNotExist': True,
+        })
 
         # OK we're ready finally replace the index.
         if not os.getenv('DRY_RUN'):
             client.move_index(tmp_index_name, index_name)
     except exceptions.AlgoliaException:
-        tmp_job_index.clear_index()
+        tmp_job_index.delete()
         print(json.dumps(suggestions[:10], indent=2))
         raise
 

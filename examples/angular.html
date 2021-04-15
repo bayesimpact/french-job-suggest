@@ -9,14 +9,18 @@
       angular.module('myApp', ['algoliasearch', 'algolia.autocomplete']).
         controller('myController', function($scope, algolia) {
           var client = algolia.Client('K6ACI9BKKT', 'da4db0bf437e37d6d49cefcb8768c67a');
-          var index = client.initIndex('jobs');
-          $scope.getDatasets = function() {
+          var index = client.initIndex('jobs_BE');
+          $scope.data = {
+            gender: '',
+            lang: 'Nl'
+          }
+          $scope.getDatasets = function(gender, lang) {
             return {
               source: algolia.sources.hits(index, { hitsPerPage: 5 }),
-              displayKey: 'libelleAppellationCourt',
+              displayKey: `jobName${gender}${lang}`,
               templates: {
                 suggestion: function(suggestion) {
-                  return suggestion._highlightResult.libelleAppellationLong.value;
+                  return suggestion._highlightResult[`jobName${gender}${lang}`].value;
                 }
               }
             };
@@ -69,14 +73,27 @@
         font-weight: bold;
         font-style: normal;
       }
+      select {
+        display: inline-block;
+        margin-bottom: 10px;
+      }
     </style>
   </head>
   <h1>Demo of JobSuggest</h1>
   <p>This is a demo for <strong>JobSuggest</strong>, an autocomplete component
-  for French job titles. See it on <a
+  for Belgian job titles. See it on <a
     href="https://github.com/bayesimpact/french-job-suggest/">GitHub</a>.</p>
   <div ng-controller="myController">
-    <input type="text" id="search-input" autocomplete aa-datasets="getDatasets()"
+    <select ng-model="data.gender">
+      <option value="">neutral</option>
+      <option value="Masculine">masculine</option>
+      <option value="Feminine">feminine</option>
+    </select>
+    <select ng-model="data.lang">
+      <option value="Fr">French</option>
+      <option value="Nl">Dutch</option>
+    </select>
+    <input type="text" id="search-input" autocomplete aa-datasets="getDatasets(data.gender, data.lang)"
            placeholder="Enter a job title..."/>
     <pre ng-show="suggestion" ng-bind="suggestion"></pre>
   </div>
